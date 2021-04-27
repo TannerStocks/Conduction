@@ -22,8 +22,8 @@ class Grid:
                 end = ' '
                 if y == 3 and (x == 1 or x == 2):
                     end = '|'
-                print(int(self.nodes[x][y].temp), end=end)
-            print()
+                print(round(self.nodes[x][y].temp, 1), end=end)
+            print('\n')
 
         
 def min(a, b):
