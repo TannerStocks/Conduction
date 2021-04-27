@@ -51,3 +51,4 @@ for t in range(100):
             print(int(grid[i][j].temp), end=' ')
         print('\n')
     print('\n')
+    print("t = ", t)
