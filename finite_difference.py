@@ -14,7 +14,8 @@ class Grid:
         for x in range(width):
             self.nodes[x] = [0]*height
             for y in range(height):
-                self.nodes[x][y] = Node(20, False) #20 degrees Celcius
+                self.nodes[x][y] = Node(22.0 , False) #20 degrees Celcius
+
 
     def print(self):
         for y in range(self.height-1, -1, -1): #backwards since it prints top to bottom
@@ -25,27 +26,11 @@ class Grid:
                 print(round(self.nodes[x][y].temp, 1), end=end)
             print('\n')
 
-        
-def min(a, b):
-    if a < b:
-        return a
-    return b
-    
 
-def max(a, b):
-    if a > b:
-        return a
-    return b
-
-
-def abs(a):
-    if a < 0:
-        return -a
-    return a
-
-
-timeStep = 1 #seconds
+diffusivity = .000115
+fourier = 0.201
 nodeSize = 0.038 #meters
+timeStep = fourier * nodeSize**2 / diffusivity #seconds
 sideLength = 6 #nodes
 targetError = 0.01 #Celcius
 
@@ -63,10 +48,18 @@ while maxTempChange > targetError:
     nextGrid = Grid(sideLength, sideLength)
     for y in range(sideLength-1, -1, -1):
         for x in range(sideLength):
-            left = max(x - 1, 0) #index of surrounding nodes. If it's an edge, use the current node.j
-            right = min(x + 1, sideLength - 1)
-            bottom = max(y - 1, 0)
-            top = min(y + 1, sideLength - 1)
+            left = x - 1
+            right = x + 1
+            bottom = y - 1
+            top = y + 1
+            if x == 0:
+                left = right
+            elif x == sideLength - 1:
+                right = left
+            if y == 0:
+                bottom = top
+            elif y == sideLength - 1:
+                top = bottom
 
             leftNode = grid.nodes[left][y].temp
             rightNode = grid.nodes[right][y].temp
@@ -80,10 +73,15 @@ while maxTempChange > targetError:
                 nextGrid.nodes[x][y].temp = average
                 maxTempChange = max(abs(nextGrid.nodes[x][y].temp - grid.nodes[x][y].temp), maxTempChange)
             nextGrid.nodes[x][y].isConstant = grid.nodes[x][y].isConstant
+            if x == 0 and y == sideLength - 1:
+                print(average)
 
-    print('\n')
-    print("cycles: ", cycles)
-    print("maxTempChange: ", round(maxTempChange, 4))
+    #print('\n')
+    #print("cycles:", cycles)
+    #print("time step:", round(timeStep, 3), "seconds")
+    #print("time:", round(cycles * timeStep), "seconds")
+    #print("maxTempChange:", round(maxTempChange, 4), "degrees Celcius")
+    #print()
     grid = nextGrid
-    grid.print()
+    #grid.print()
     cycles += 1
